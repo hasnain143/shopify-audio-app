@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopify Audio App</title>
+  <script src="https://unpkg.com/@shopify/app-bridge@3.6.4/umd/index.js"></script>
+</head>
+<body>
+  <h2>🎧 Welcome to the Shopify Audio App</h2>
+
+  <script>
+    const AppBridge = window['app-bridge'];
+    const createApp = AppBridge.default;
+
+    const app = createApp({
+      apiKey: 'e02234fdd240974b9e24939405c715f3',
+      shopOrigin: new URLSearchParams(window.location.search).get("shop"),
+      forceRedirect: true
+    });
+  </script>
+</body>
+</html>
