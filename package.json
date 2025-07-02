@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/hasnain143/shopify-audio-app#readme",
   "dependencies": {
+    "@shopify/shopify-api": "^11.13.0",
+    "dotenv": "^17.0.1",
     "express": "^5.1.0"
   }
 }
