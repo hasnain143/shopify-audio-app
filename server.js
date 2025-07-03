@@ -1,14 +1,15 @@
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
 const { shopifyApi, LATEST_API_VERSION } = require("@shopify/shopify-api");
-const { restResources } = require("@shopify/shopify-api/rest/admin/2024-04");
+const { MemorySessionStorage } = require("@shopify/shopify-api/lib/auth/session");
 const path = require("path");
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Setup Shopify API
+// Serve static files (like index.html)
+app.use(express.static(path.join(__dirname, "views")));
+
 const shopify = shopifyApi({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
@@ -16,55 +17,38 @@ const shopify = shopifyApi({
   hostName: process.env.HOST.replace(/^https?:\/\//, ""),
   isEmbeddedApp: true,
   apiVersion: LATEST_API_VERSION,
-  restResources,
-  sessionStorage: new (require("@shopify/shopify-api").MemorySessionStorage)(),
+  sessionStorage: new MemorySessionStorage(),
 });
 
-// Serve static files (like index.html)
-app.use(express.static(path.join(__dirname, "views")));
-
-// Home route (iframe)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views/index.html"));
-});
-
-// Auth start
+// Step 1: Start OAuth
 app.get("/auth", async (req, res) => {
-  const shop = req.query.shop;
-
-  if (!shop) {
-    return res.status(400).send("Missing 'shop' query parameter");
-  }
-
   const redirectUrl = await shopify.auth.begin({
-    shop,
+    shop: req.query.shop,
     callbackPath: "/auth/callback",
-    isOnline: true,
+    isOnline: false,
     rawRequest: req,
     rawResponse: res,
   });
-
   return res.redirect(redirectUrl);
 });
 
-// Auth callback
+// Step 2: OAuth Callback
 app.get("/auth/callback", async (req, res) => {
   try {
-    const session = await shopify.auth.callback({
+    await shopify.auth.validateCallback({
       rawRequest: req,
       rawResponse: res,
     });
-
-    console.log("✅ Auth success:", session.shop);
-
-    return res.redirect(`https://${session.shop}/admin/apps`);
-  } catch (error) {
-    console.error("❌ Auth error:", error);
+    return res.redirect("/");
+  } catch (e) {
+    console.error("Auth error", e);
     return res.status(500).send("Authentication failed");
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🎧 Shopify Audio App running on http://localhost:${PORT}`);
+// Homepage
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "index.html"));
 });
+
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
