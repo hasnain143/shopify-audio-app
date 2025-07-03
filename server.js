@@ -16,9 +16,9 @@ const shopify = shopifyApi({
   hostName: process.env.HOST.replace(/^https?:\/\//, ''),
   isEmbeddedApp: true,
   apiVersion: LATEST_API_VERSION,
-  // ✅ Add this:
   adapter: shopifyApiAdapter,
 });
+
 
 
 app.get('/auth', async (req, res) => {
