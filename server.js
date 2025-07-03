@@ -1,58 +1,70 @@
-const express = require('express');
-const dotenv = require('dotenv');
+const express = require("express");
+const dotenv = require("dotenv");
+const { shopifyApi, LATEST_API_VERSION } = require("@shopify/shopify-api");
+const { restResources } = require("@shopify/shopify-api/rest/admin/2024-04");
+const path = require("path");
+
 dotenv.config();
-
-const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
-const { shopifyApiAdapter } = require('@shopify/shopify-api/adapters/node'); // ✅ This only
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Shopify API Setup
+// Setup Shopify API
 const shopify = shopifyApi({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
-  scopes: process.env.SCOPES.split(','),
-  hostName: process.env.HOST.replace(/^https?:\/\//, ''),
-  isEmbeddedApp: true, // ✅ IMPORTANT
+  scopes: process.env.SCOPES.split(","),
+  hostName: process.env.HOST.replace(/^https?:\/\//, ""),
+  isEmbeddedApp: true,
   apiVersion: LATEST_API_VERSION,
-  adapter: shopifyApiAdapter,
+  restResources,
+  sessionStorage: new (require("@shopify/shopify-api").MemorySessionStorage)(),
 });
 
-app.get('/auth', async (req, res) => {
-  const shop = req.query.shop;
-  if (!shop) return res.status(400).send('Missing shop parameter');
+// Serve static files (like index.html)
+app.use(express.static(path.join(__dirname, "views")));
 
-  const authRoute = await shopify.auth.begin({
+// Home route (iframe)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "views/index.html"));
+});
+
+// Auth start
+app.get("/auth", async (req, res) => {
+  const shop = req.query.shop;
+
+  if (!shop) {
+    return res.status(400).send("Missing 'shop' query parameter");
+  }
+
+  const redirectUrl = await shopify.auth.begin({
     shop,
-    callbackPath: '/auth/callback',
+    callbackPath: "/auth/callback",
     isOnline: true,
     rawRequest: req,
     rawResponse: res,
   });
 
-  return res.redirect(authRoute);
+  return res.redirect(redirectUrl);
 });
 
-app.get('/auth/callback', async (req, res) => {
+// Auth callback
+app.get("/auth/callback", async (req, res) => {
   try {
-    const session = await shopify.auth.validateCallback(req, res, req.query);
-    console.log('✅ Auth successful:', session.shop);
+    const session = await shopify.auth.callback({
+      rawRequest: req,
+      rawResponse: res,
+    });
 
-    // Redirect to embedded admin view
+    console.log("✅ Auth success:", session.shop);
+
     return res.redirect(`https://${session.shop}/admin/apps`);
   } catch (error) {
-    console.error('❌ Auth error:', error);
-    return res.status(500).send('Authentication failed');
+    console.error("❌ Auth error:", error);
+    return res.status(500).send("Authentication failed");
   }
 });
 
-app.use(express.static('views'));
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html');
-});
-
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 App running at http://localhost:${PORT}`);
+  console.log(`🎧 Shopify Audio App running on http://localhost:${PORT}`);
 });
