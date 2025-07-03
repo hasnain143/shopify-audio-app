@@ -1,6 +1,9 @@
 const express = require('express');
 const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
 const dotenv = require('dotenv');
+const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
+const { shopifyApiAdapter } = require('@shopify/shopify-api/adapters/node'); // ✅ Add this line
+
 
 dotenv.config();
 
@@ -15,7 +18,10 @@ const shopify = shopifyApi({
   hostName: process.env.HOST.replace(/^https?:\/\//, ''),
   isEmbeddedApp: true,
   apiVersion: LATEST_API_VERSION,
+  // ✅ Add this:
+  adapter: shopifyApiAdapter,
 });
+
 
 app.get('/auth', async (req, res) => {
   const shop = req.query.shop;
