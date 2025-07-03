@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const { shopifyApi, LATEST_API_VERSION } = require("@shopify/shopify-api");
-const { MemorySessionStorage } = require("@shopify/shopify-api/lib/auth/session");
+const { shopifyApi, LATEST_API_VERSION, memorySessionStorage } = require("@shopify/shopify-api");
+
 const path = require("path");
 
 const app = express();
@@ -17,7 +18,7 @@ const shopify = shopifyApi({
   hostName: process.env.HOST.replace(/^https?:\/\//, ""),
   isEmbeddedApp: true,
   apiVersion: LATEST_API_VERSION,
-  sessionStorage: new MemorySessionStorage(),
+  sessionStorage: memorySessionStorage(),
 });
 
 // Step 1: Start OAuth
