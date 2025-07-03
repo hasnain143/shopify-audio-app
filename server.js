@@ -1,11 +1,9 @@
 const express = require('express');
-const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
 const dotenv = require('dotenv');
-const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
-const { shopifyApiAdapter } = require('@shopify/shopify-api/adapters/node'); // ✅ Add this line
-
-
 dotenv.config();
+
+const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
+const { shopifyApiAdapter } = require('@shopify/shopify-api/adapters/node'); // ✅ This only
 
 const app = express();
 const PORT = process.env.PORT || 3000;
