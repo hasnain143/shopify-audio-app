@@ -19,8 +19,6 @@ const shopify = shopifyApi({
   adapter: shopifyApiAdapter,
 });
 
-
-
 app.get('/auth', async (req, res) => {
   const shop = req.query.shop;
   if (!shop) return res.status(400).send('Missing shop parameter');
