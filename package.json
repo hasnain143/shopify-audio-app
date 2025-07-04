@@ -1,20 +1,24 @@
 {
   "name": "shopify-audio-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Shopify app to sell and stream music/audio content",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hasnain143/shopify-audio-app.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "shopify",
+    "music",
+    "audio",
+    "node"
+  ],
+  "author": "Syed Hasnain Shah",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/hasnain143/shopify-audio-app/issues"
   },
@@ -22,6 +26,6 @@
   "dependencies": {
     "@shopify/shopify-api": "^11.13.0",
     "dotenv": "^17.0.1",
-    "express": "^5.1.0"
+    "express": "^4.21.2"
   }
 }
