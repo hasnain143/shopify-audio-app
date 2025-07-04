@@ -4,8 +4,8 @@ const path = require('path');
 
 // CORRECT IMPORTS FOR SHOPIFY API v11.13.0
 //const { shopifyApi, LATEST_API_VERSION } = require('@shopify/shopify-api');
-//const { MemorySessionStorage } = require('@shopify/shopify-api/session-storage/memory');
-const { shopifyApi, LATEST_API_VERSION, memorySessionStorage } = require("@shopify/shopify-api");
+const { MemorySessionStorage } = require('@shopify/shopify-api/session-storage/memory');
+//const { shopifyApi, LATEST_API_VERSION, memorySessionStorage } = require("@shopify/shopify-api");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
